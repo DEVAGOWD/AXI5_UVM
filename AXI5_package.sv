@@ -1,0 +1,141 @@
+
+
+
+
+package AXI5_package;
+
+typedef enum {read=0,write=1} axi5_write_read_e;
+
+
+typedef enum{AXI5_CONFIG_SETUP_TIME,AXI5_CONFIG_HOLD_TIME,AXI5_CONFIG_BURST_TIMEOUT_FACTOR,AXI5_CONFIG_MAX_TRANSACTION_TIME_FACTOR,
+			AXI5_CONFIG_ENABLE_RLAST,AXI5_CONFIG_ENABLE_SLAVE_EXCLUSIVE,AXI5_CONFIG_ENABLE_ALL_ASSERTIONS,AXI5_CONFIG_ENABLE_ASSERTION,
+			AXI5_CONFIG_MAX_LATENCY_AWVALID_ASSERTION_TO_AWREADY,AXI5_CONFIG_MAX_LATENCY_ARVALID_ASSERTION_TO_ARREADY,
+			AXI5_CONFIG_MAX_LATENCY_RVALID_ASSERTION_TO_RREADY,AXI5_CONFIG_MAX_LATENCY_BVALID_ASSERTION_TO_BREADY,
+			AXI5_CONFIG_MAX_LATENCY_WVALID_ASSERTION_TO_WREADY,AXI5_CONFIG_ENABLE_QOS,AXI5_CONFIG_READ_DATA_REORDERING_DEPTH,
+			AXI5_CONFIG_SLAVE_START_ADDR,AXI5_CONFIG_SLAVE_END_ADDR,AXI5_CONFIG_MAX_OUTSTANDING_WR,AXI5_CONFIG_MAX_OUTSTANDING_RD,
+			AXI5_CONFIG_NUM_OUTSTANDING_WR_PHASE,AXI5_CONFIG_NUM_OUTSTANDING_RD_PHASE}config_en;
+
+
+
+typedef bit[31:0] _max_bit_t;
+
+//=============== awatop
+typedef enum{NON_ATOMIC='d0,ATOMIC_STORE_LITTLE_ENDIAN_ADD='d16,ATOMIC_STORE_LITTLE_ENDIAN_CLR='d17,ATOMIC_STORE_LITTLE_ENDIAN_EOR='d18,ATOMIC_STORE_LITTLE_ENDIAN_SET='d19,ATOMIC_STORE_LITTLE_ENDIAN_SMAX='d20,ATOMIC_STORE_LITTLE_ENDIAN_SMIN='d21,ATOMIC_STORE_LITTLE_ENDIAN_UMAX='d22,ATOMIC_STORE_LITTLE_ENDIAN_UMIN='d23,ATOMIC_STORE_BIG_ENDIAN_ADD='d24,ATOMIC_STORE_BIG_ENDIAN_CLR='d25,ATOMIC_STORE_BIG_ENDIAN_EOR='d26,ATOMIC_STORE_BIG_ENDIAN_SET='d27,ATOMIC_STORE_BIG_ENDIAN_SMAX='d28,ATOMIC_STORE_BIG_ENDIAN_SMIN='d29,ATOMIC_STORE_BIG_ENDIAN_UMAX='d30,ATOMIC_STORE_BIG_ENDIAN_UMIN='d31,ATOMIC_LOAD_LITTLE_ENDIAN_ADD='d32,ATOMIC_LOAD_LITTLE_ENDIAN_CLR='d33,ATOMIC_LOAD_LITTLE_ENDIAN_EOR='d34,ATOMIC_LOAD_LITTLE_ENDIAN_SET='d35,ATOMIC_LOAD_LITTLE_ENDIAN_SMAX='d36,ATOMIC_LOAD_LITTLE_ENDIAN_SMIN='d37,ATOMIC_LOAD_LITTLE_ENDIAN_UMAX='d38,ATOMIC_LOAD_LITTLE_ENDIAN_UMIN='d39,ATOMIC_LOAD_BIG_ENDIAN_ADD='d40,ATOMIC_LOAD_BIG_ENDIAN_CLR='d41,ATOMIC_LOAD_BIG_ENDIAN_EOR='d42,ATOMIC_LOAD_BIG_ENDIAN_SET='d43,ATOMIC_LOAD_BIG_ENDIAN_SMAX='d44,ATOMIC_LOAD_BIG_ENDIAN_SMIN='d45,ATOMIC_LOAD_BIG_ENDIAN_UMAX='d46,ATOMIC_LOAD_BIG_ENDIAN_UMIN='d47,ATOMIC_SWAP='d48,ATOMIC_COMPARE='d49}axi5_awatop_e;
+
+
+typedef enum {AXI_BYTES_1 = 'd0,AXI_BYTES_2 = 'd1,AXI_BYTES_4 = 'd2,AXI_BYTES_8 = 'd3,AXI_BYTES_16 = 'd4,AXI_BYTES_32 = 'd5,AXI_BYTES_64 = 'd6,
+AXI_BYTES_128 = 'd7}axi5_size_e;
+
+typedef enum {AXI_FIXED = 'd0,AXI_INCR = 'd1,AXI_WRAP = 'd2,AXI_BURST_RSVD = 'd3}axi5_burst_e;
+
+typedef enum {AXI_NORMAL = 'd0,AXI_EXCLUSIVE = 'd1}axi5_lock_e;
+
+typedef enum{AXI5_CLOCK_POSEDGE,AXI5_CLOCK_NEGEDGE,AXI5_RESET_POSEDGE,AXI5_RESET_NEGEDGE}wait_on_e;
+
+		typedef struct {
+
+				bit [1:0] BRESP;
+				bit       BIDUNQ;
+				bit [7:0] BID;
+
+                } unq_struct;
+	typedef struct {
+
+				bit [1:0] RRESP;
+				bit       RIDUNQ;
+				bit [7:0] RID;
+
+                } unq_struct_rd;
+
+`define MAX_AXI5_DATA_WIDTH 16
+`define MAX_AXI5_ADDRESS_WIDTH 64
+`define MAX_AXI5_ID_WIDTH 8
+
+//===============for passing len and size
+`define LEN 7
+`define SIZE 0
+`define BURST 1
+`define ADDRESS 0
+//`define MAX_AXI5_WRITE_DATA_BUS_WIDTH 64
+//`define MAX_AXI5_READ_DATA_BUS_WIDTH 64
+//typedef bit [((`MAX_AXI5_DATA_WIDTH/8)-1):0]array[]; 
+//------------------------------------------------------------------------------------------------
+
+// Used for configuration purpose
+	typedef struct {
+
+				bit [(`MAX_AXI5_ID_WIDTH-1):0] AWID;
+				bit       AWIDUNQ;
+                } unq_id_struct;
+
+		typedef struct {
+
+				bit [(`MAX_AXI5_ID_WIDTH-1):0] ARID;
+				bit       ARIDUNQ;
+                } unq_id_struct_rd;
+
+typedef struct {
+
+	bit [127:0] RDATA;
+	bit [(`MAX_AXI5_DATA_WIDTH/128)-1:0] RCHUNKSTRB;
+	bit [$clog2(4096/(`MAX_AXI5_DATA_WIDTH/8))-1:0] RCHUNKNUM;
+	bit [1:0]RPOISON;
+	} chunk_store;
+
+
+
+// For prot defination purpose
+typedef enum{AXI5_NORM_SEC_DATA,AXI5_PRIV_SEC_DATA,AXI5_NORM_NONSEC_DATA,AXI5_PRIV_NONSEC_DATA,
+			 AXI5_NORM_SEC_INST,AXI5_PRIV_SEC_INST,AXI5_NORM_NONSEC_INST,AXI5_PRIV_NONSEC_INST}axi_prot_e;
+
+// For burst type
+//typedef enum{AXI5_FIXED,AXI5_INCR,AXI5_WRAP,AXI5_BURST_RSVD}axi_burst_e;
+
+// For lock def purpose
+//typedef enum{AXI5_NORMAL,AXI5_EXCLUSIVE}axi_lock_e;
+
+// For Cache def purpose
+typedef enum{AXI5_NONMODIFIABLE_NONBUF,AXI5_BUF_ONLY,AXI5_CACHE_NOALLOC,AXI5_CACHE_2,AXI5_CACHE_3,AXI5_CACHE_RSVD4,
+			AXI5_CACHE_RSVD5,AXI5_CACHE_6,AXI5_CACHE_7,AXI5_CACHE_RSVD8,AXI5_CACHE_RSVD9,AXI5_CACHE_10,AXI5_CACHE_11,
+			AXI5_CACHE_RSVD12,AXI5_CACHE_RSVD13,AXI5_CACHE_14,AXI5_CACHE_15}axi_cache_e;
+
+// For resp purpose
+typedef enum{AXI5_OKAY,AXI5_EXOKAY,AXI5_SLVERR,AXI5_DECERR}axi_response_e;
+
+// TO know transaction is read or write
+//typedef enum{AXI5_TRANS_READ,AXI5_TRANS_WRITE}axi_rw_e;
+
+// For Event purpose
+//typedef enum{AXI5_CLOCK_POSEDGE,AXI5_CLOCK_NEGEDGE,AXI5_RESET_POSEDGE,AXI5_RESET_NEGEDGE}wait_on_e;
+
+	import uvm_pkg ::*;
+
+	`include "uvm_macros.svh"
+
+	`include "../AXI5_SEQUENCES/AXI5_sequence_item.sv"
+
+	`include "../AXI5_TOP/AXI5_config.sv"
+	`include "../AXI5_SEQUENCES/AXI5_sequence.sv"
+	`include "../AXI5_SEQUENCES/AXI5_slave_sequence.sv"
+
+	`include "../AXI5_ACTIVE_AGENT/AXI5_sequencer.sv"
+	`include "../AXI5_ACTIVE_AGENT/AXI5_slave_sequencer.sv"
+
+	`include "../AXI5_ACTIVE_AGENT/AXI5_driver.sv"
+	`include "../AXI5_ACTIVE_AGENT/AXI5_slave_driver.sv"
+
+	`include "../AXI5_ACTIVE_AGENT/AXI5_input_monitor.sv"
+	`include "../AXI5_ACTIVE_AGENT/AXI5_active_agent.sv"
+	`include "../AXI5_ACTIVE_AGENT/AXI5_slave_active_agent.sv"
+
+	`include "../AXI5_PASSIVE_AGENT/AXI5_output_monitor.sv"
+	`include "../AXI5_PASSIVE_AGENT/AXI5_passive_agent.sv"
+	`include "../AXI5_ENVIRONMENT/AXI5_scoreboard.sv"
+	`include "../AXI5_ENVIRONMENT/AXI5_coverage.sv"
+	`include "../AXI5_ENVIRONMENT/AXI5_environment.sv"
+	`include "../AXI5_ENVIRONMENT/AXI5_slave_environment.sv"
+
+
+	`include "AXI5_test.sv"
+
+endpackage
